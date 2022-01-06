@@ -1,6 +1,27 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
+import axios from "axios";
+import DisplayWeather from "./DisplayWeather";
 
 const DisplayCountry =({country})=>{
+
+    console.log(country)
+    const apiKey = process.env.REACT_APP_API_KEY
+    const capital = country.capital[0]
+    const [weather, setWeather] = useState([])
+    console.log(apiKey, capital)
+
+    const fetchWeather = ()=>{
+        axios.get(`http://api.openweathermap.org/data/2.5/weather?q=${capital}&appid=${apiKey}`).then(
+            r=>{
+                const data = r.data.weather
+                console.log(data)
+                setWeather(data)
+            }
+        )
+    }
+
+    useEffect(fetchWeather,[])
+    
     const languages =[] 
     for (var p in country.languages)
         languages.push(
@@ -22,9 +43,13 @@ const DisplayCountry =({country})=>{
                 }
             </ul>
             <div>
-                <img src={country.flags.png} alt={country.name.common}></img>
+                <img src={country.flags.png} alt={country.name.common} ></img>
             </div>
             <hr></hr>
+            {
+                weather.length>0 ? <DisplayWeather weather={weather} capital={capital}></DisplayWeather>:
+                <p>choose 1 country to see the weather</p>
+            }
         </div>
     )
 }
